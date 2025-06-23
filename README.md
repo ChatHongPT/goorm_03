@@ -9,8 +9,9 @@
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=flat-square&logo=javascript&logoColor=%23F7DF1E)
 ![GitHub API](https://img.shields.io/badge/GitHub%20API-181717?style=flat-square&logo=github&logoColor=white)
 
-> 🚀 **아름답고 현대적인 GitHub 사용자 검색 웹 애플리케이션**
+<img width="1323" alt="Github Finder" src="https://github.com/user-attachments/assets/407807cb-4e66-49bc-8b30-74d29562653c" />
 
+> 🚀 **아름답고 현대적인 GitHub 사용자 검색 웹 애플리케이션**
 GitHub API를 활용하여 사용자 프로필, 저장소 정보, 그리고 기여도 그래프를 실시간으로 조회할 수 있는 반응형 웹 애플리케이션입니다.
 
 ## ✨ 주요 기능
@@ -54,7 +55,7 @@ GitHub API를 활용하여 사용자 프로필, 저장소 정보, 그리고 기�
 1. **저장소 클론**
 
    ```bash
-   git clone https://github.com/your-username/github-finder.git
+   git clone https://github.com/ChatHongPT/goorm_03.git
    cd github-finder
    ```
 
@@ -62,13 +63,10 @@ GitHub API를 활용하여 사용자 프로필, 저장소 정보, 그리고 기�
 
    ```
    github-finder/
-   ├── html/
-   │   └── index.html      # 메인 HTML 파일
-   ├── css/
-   │   └── style.css       # 스타일시트
-   ├── js/
-   │   └── app.js          # JavaScript 로직
-   └── README.md           # 문서
+   ├── index.html      # 메인 HTML 파일
+   ├── style.css       # 스타일시트
+   ├── app.js          # JavaScript 로직
+   └── README.md       # 문서
    ```
 
 3. **웹 서버 실행**
@@ -191,7 +189,7 @@ class GitHubAPI {
 
 ## 🛠 GitHub Actions
 
-![Deploy to GitHub Pages](https://github.com/your-username/github-finder/actions/workflows/main.yml/badge.svg?branch=main)
+![Deploy to GitHub Pages](https://github.com/ChatHongPT/goorm_03/actions/workflows/gh-pages.yml/badge.svg?branch=main)
 
 ```yaml
 # .github/workflows/main.yml
