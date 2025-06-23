@@ -73,12 +73,19 @@ jobs:
           HTML_FOUND=false
 
           if [ -f "index.html" ]; then
+            # HTML 파일 복사 및 경로 수정
             cp index.html public/index.html
-            echo "✅ Found and copied: ROOT/index.html → public/index.html"
+            # CSS와 JS 경로를 배포용으로 수정
+            sed -i 's|href="css/style.css"|href="style.css"|g' public/index.html
+            sed -i 's|src="js/app.js"|src="app.js"|g' public/index.html
+            echo "✅ Found and copied: ROOT/index.html → public/index.html (paths fixed)"
             HTML_FOUND=true
           elif [ -f "html/index.html" ]; then
             cp html/index.html public/index.html
-            echo "✅ Found and copied: html/index.html → public/index.html"
+            # CSS와 JS 경로를 배포용으로 수정
+            sed -i 's|href="css/style.css"|href="style.css"|g' public/index.html
+            sed -i 's|src="js/app.js"|src="app.js"|g' public/index.html
+            echo "✅ Found and copied: html/index.html → public/index.html (paths fixed)"
             HTML_FOUND=true
           else
             echo "❌ No index.html found in root or html/ folder!"
