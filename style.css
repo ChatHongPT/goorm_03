@@ -164,6 +164,7 @@ button:hover {
   flex-direction: column;
   align-items: center;
   min-width: 150px;
+  text-align: center;
 }
 
 .profile-left img {
@@ -181,8 +182,7 @@ button:hover {
 }
 
 .view-btn {
-  display: inline-block;
-  margin-top: 20px;
+  margin: 16px 0;
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
   padding: 12px 24px;
