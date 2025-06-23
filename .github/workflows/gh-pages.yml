@@ -131,7 +131,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: ✅ Success notification
+      - name: ✅ Success notifications
         run: |
           echo ""
           echo "🎉 Deployment successful!"
