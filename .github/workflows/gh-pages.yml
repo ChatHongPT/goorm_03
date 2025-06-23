@@ -38,27 +38,44 @@ jobs:
           ls -la
           echo ""
           echo "🔍 Specific file checks:"
-          echo "Root index.html: $([ -f 'index.html' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-          echo "HTML folder: $([ -d 'html' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-          echo "CSS folder: $([ -d 'css' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-          echo "JS folder: $([ -d 'js' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
+          if [ -f 'index.html' ]; then
+            echo "Root index.html: ✅ EXISTS"
+          else
+            echo "Root index.html: ❌ MISSING"
+          fi
+
+          if [ -d 'html' ]; then
+            echo "HTML folder: ✅ EXISTS"
+          else
+            echo "HTML folder: ❌ MISSING"
+          fi
+
+          if [ -d 'css' ]; then
+            echo "CSS folder: ✅ EXISTS"
+          else
+            echo "CSS folder: ❌ MISSING"
+          fi
+
+          if [ -d 'js' ]; then
+            echo "JS folder: ✅ EXISTS"
+          else
+            echo "JS folder: ❌ MISSING"
+          fi
 
       - name: 📂 Smart file detection and copying
         run: |
           echo "🏗️ Creating public directory..."
           mkdir -p public
-          
+
           echo "🧠 Smart file detection started..."
-          
+
           # Find and copy HTML file
           HTML_FOUND=false
-          
-          # Check root first
+
           if [ -f "index.html" ]; then
             cp index.html public/index.html
             echo "✅ Found and copied: ROOT/index.html → public/index.html"
             HTML_FOUND=true
-          # Check html folder as fallback
           elif [ -f "html/index.html" ]; then
             cp html/index.html public/index.html
             echo "✅ Found and copied: html/index.html → public/index.html"
@@ -66,7 +83,7 @@ jobs:
           else
             echo "❌ No index.html found in root or html/ folder!"
           fi
-          
+
           # Find and copy CSS file
           CSS_FOUND=false
           if [ -f "style.css" ]; then
@@ -80,7 +97,7 @@ jobs:
           else
             echo "⚠️ No style.css found in root or css/ folder"
           fi
-          
+
           # Find and copy JS file
           JS_FOUND=false
           if [ -f "app.js" ]; then
@@ -94,69 +111,69 @@ jobs:
           else
             echo "⚠️ No app.js found in root or js/ folder"
           fi
-          
+
           # Copy README
           if [ -f "README.md" ]; then
             cp README.md public/readme.md
             echo "✅ Copied: README.md → public/readme.md"
           fi
-          
-          # Final validation
-          if [ "$HTML_FOUND" = false ]; then
+
+          # Create emergency HTML if needed
+          if [ "$HTML_FOUND" = "false" ]; then
             echo "💥 CRITICAL ERROR: No HTML file found!"
             echo "📝 Creating emergency index.html..."
-            cat > public/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Finder - File Missing</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding: 50px; 
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .container {
-            background: rgba(255,255,255,0.1);
-            padding: 40px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }
-        .error { color: #ff6b6b; font-size: 1.2em; margin: 20px 0; }
-        .info { color: #4ecdc4; margin: 15px 0; }
-        .code { 
-            background: rgba(0,0,0,0.3); 
-            padding: 15px; 
-            border-radius: 10px; 
-            font-family: monospace;
-            margin: 20px 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🔍 GitHub Finder</h1>
-        <p class="error">⚠️ index.html 파일을 찾을 수 없습니다</p>
-        <p class="info">다음 위치 중 하나에 파일을 업로드해주세요:</p>
-        <div class="code">
-            📁 저장소 루트/index.html<br>
-            📁 저장소 루트/html/index.html
-        </div>
-        <p class="info">파일 업로드 후 자동으로 다시 배포됩니다.</p>
-    </div>
-</body>
-</html>
-EOF
+            cat > public/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="ko">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>GitHub Finder - File Missing</title>
+              <style>
+                  body { 
+                      font-family: Arial, sans-serif; 
+                      text-align: center; 
+                      padding: 50px; 
+                      background: linear-gradient(135deg, #667eea, #764ba2);
+                      color: white;
+                      min-height: 100vh;
+                      margin: 0;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      flex-direction: column;
+                  }
+                  .container {
+                      background: rgba(255,255,255,0.1);
+                      padding: 40px;
+                      border-radius: 20px;
+                      backdrop-filter: blur(10px);
+                  }
+                  .error { color: #ff6b6b; font-size: 1.2em; margin: 20px 0; }
+                  .info { color: #4ecdc4; margin: 15px 0; }
+                  .code { 
+                      background: rgba(0,0,0,0.3); 
+                      padding: 15px; 
+                      border-radius: 10px; 
+                      font-family: monospace;
+                      margin: 20px 0;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>🔍 GitHub Finder</h1>
+                  <p class="error">⚠️ index.html 파일을 찾을 수 없습니다</p>
+                  <p class="info">다음 위치 중 하나에 파일을 업로드해주세요:</p>
+                  <div class="code">
+                      📁 저장소 루트/index.html<br>
+                      📁 저장소 루트/html/index.html
+                  </div>
+                  <p class="info">파일 업로드 후 자동으로 다시 배포됩니다.</p>
+              </div>
+          </body>
+          </html>
+          HTMLEOF
             echo "🆘 Emergency index.html created"
           fi
 
