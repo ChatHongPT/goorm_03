@@ -5,17 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GitHub Finder</title>
 
-  <!-- 📌 GitHub Pages base path -->
-  <base href="/goorm_03/">
-
-  <!-- ✅ CSS -->
-  <link rel="stylesheet" href="style.css" />
+  <!-- ✅ 기본 base -->
+  <base href="/" />
+  <script>
+    // GitHub Pages 환경에서는 base를 /goorm_03/로 설정
+    if (location.hostname.includes("github.io")) {
+      document.querySelector("base").setAttribute("href", "/goorm_03/");
+    }
+  </script>
 
   <!-- ✅ Google Fonts: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
 
-  <!-- ✅ FontAwesome Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <!-- ✅ Font Awesome (Icons) -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- ✅ Local CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <nav class="navbar">
@@ -31,7 +43,11 @@
     </p>
 
     <div class="search-section">
-      <input type="text" id="usernameInput" placeholder="Enter GitHub username" />
+      <input
+        type="text"
+        id="usernameInput"
+        placeholder="Enter GitHub username"
+      />
       <button id="searchBtn">
         <i class="fas fa-search"></i>
         검색
@@ -39,7 +55,6 @@
     </div>
 
     <div id="spinner" class="spinner hidden"></div>
-
     <div id="profile"></div>
     <div id="repos"></div>
     <div id="grass"></div>
@@ -50,6 +65,7 @@
     GitHub Finder © 2025
   </footer>
 
+  <!-- ✅ Local JS -->
   <script src="app.js"></script>
 </body>
 </html>
