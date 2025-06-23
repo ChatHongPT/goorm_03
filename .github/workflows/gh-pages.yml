@@ -28,168 +28,82 @@ jobs:
       - name: 🔧 Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: 🔍 Complete repository scan
+      - name: 🔍 Debug repository structure
         run: |
-          echo "📁 Repository structure analysis:"
-          echo "=================================="
-          find . -type f -name "*.html" -o -name "*.css" -o -name "*.js" | head -20
-          echo ""
-          echo "📂 Directory listing:"
+          echo "📁 Repository root contents:"
           ls -la
           echo ""
-          echo "🔍 Specific file checks:"
-          if [ -f 'index.html' ]; then
-            echo "Root index.html: ✅ EXISTS"
+          echo "📂 CSS folder:"
+          if [ -d "css" ]; then
+            ls -la css/
           else
-            echo "Root index.html: ❌ MISSING"
+            echo "❌ css/ folder not found"
           fi
-
-          if [ -d 'html' ]; then
-            echo "HTML folder: ✅ EXISTS"
+          echo ""
+          echo "📂 JS folder:"
+          if [ -d "js" ]; then
+            ls -la js/
           else
-            echo "HTML folder: ❌ MISSING"
+            echo "❌ js/ folder not found"
           fi
+          echo ""
+          echo "🔍 Required files check:"
+          echo "index.html: $([ -f 'index.html' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
+          echo "css/style.css: $([ -f 'css/style.css' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
+          echo "js/app.js: $([ -f 'js/app.js' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
 
-          if [ -d 'css' ]; then
-            echo "CSS folder: ✅ EXISTS"
-          else
-            echo "CSS folder: ❌ MISSING"
-          fi
-
-          if [ -d 'js' ]; then
-            echo "JS folder: ✅ EXISTS"
-          else
-            echo "JS folder: ❌ MISSING"
-          fi
-
-      - name: 📂 Smart file detection and copying
+      - name: 📂 Build for GitHub Pages
         run: |
-          echo "🏗️ Creating public directory..."
+          echo "🏗️ Creating build directory..."
           mkdir -p public
 
-          echo "🧠 Smart file detection started..."
+          echo "📋 Copying files and fixing paths..."
 
-          # Find and copy HTML file
-          HTML_FOUND=false
-
+          # Copy index.html and fix paths for deployment
           if [ -f "index.html" ]; then
-            # HTML 파일 복사 및 경로 수정
+            echo "✅ Processing index.html..."
+            # Copy and modify paths for flat structure
             cp index.html public/index.html
-            # CSS와 JS 경로를 배포용으로 수정
+            
+            # Fix CSS path: css/style.css → style.css
             sed -i 's|href="css/style.css"|href="style.css"|g' public/index.html
+            
+            # Fix JS path: js/app.js → app.js  
             sed -i 's|src="js/app.js"|src="app.js"|g' public/index.html
-            echo "✅ Found and copied: ROOT/index.html → public/index.html (paths fixed)"
-            HTML_FOUND=true
-          elif [ -f "html/index.html" ]; then
-            cp html/index.html public/index.html
-            # CSS와 JS 경로를 배포용으로 수정
-            sed -i 's|href="css/style.css"|href="style.css"|g' public/index.html
-            sed -i 's|src="js/app.js"|src="app.js"|g' public/index.html
-            echo "✅ Found and copied: html/index.html → public/index.html (paths fixed)"
-            HTML_FOUND=true
+            
+            echo "✅ Fixed paths in index.html for deployment"
           else
-            echo "❌ No index.html found in root or html/ folder!"
+            echo "❌ index.html not found!"
+            exit 1
           fi
 
-          # Find and copy CSS file
-          CSS_FOUND=false
-          if [ -f "style.css" ]; then
-            cp style.css public/style.css
-            echo "✅ Found and copied: ROOT/style.css → public/style.css"
-            CSS_FOUND=true
-          elif [ -f "css/style.css" ]; then
+          # Copy CSS file
+          if [ -f "css/style.css" ]; then
             cp css/style.css public/style.css
-            echo "✅ Found and copied: css/style.css → public/style.css"
-            CSS_FOUND=true
+            echo "✅ Copied css/style.css → public/style.css"
           else
-            echo "⚠️ No style.css found in root or css/ folder"
+            echo "❌ css/style.css not found!"
           fi
 
-          # Find and copy JS file
-          JS_FOUND=false
-          if [ -f "app.js" ]; then
-            cp app.js public/app.js
-            echo "✅ Found and copied: ROOT/app.js → public/app.js"
-            JS_FOUND=true
-          elif [ -f "js/app.js" ]; then
+          # Copy JS file
+          if [ -f "js/app.js" ]; then
             cp js/app.js public/app.js
-            echo "✅ Found and copied: js/app.js → public/app.js"
-            JS_FOUND=true
+            echo "✅ Copied js/app.js → public/app.js"
           else
-            echo "⚠️ No app.js found in root or js/ folder"
+            echo "❌ js/app.js not found!"
           fi
 
-          # Copy README
-          if [ -f "README.md" ]; then
-            cp README.md public/readme.md
-            echo "✅ Copied: README.md → public/readme.md"
-          fi
+          # Copy other files if they exist
+          [ -f "README.md" ] && cp README.md public/readme.md && echo "✅ Copied README.md"
+          [ -f "favicon.ico" ] && cp favicon.ico public/ && echo "✅ Copied favicon.ico"
 
-          # Create emergency HTML if needed
-          if [ "$HTML_FOUND" = "false" ]; then
-            echo "💥 CRITICAL ERROR: No HTML file found!"
-            echo "📝 Creating emergency index.html..."
-            cat > public/index.html << 'HTMLEOF'
-          <!DOCTYPE html>
-          <html lang="ko">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>GitHub Finder - File Missing</title>
-              <style>
-                  body { 
-                      font-family: Arial, sans-serif; 
-                      text-align: center; 
-                      padding: 50px; 
-                      background: linear-gradient(135deg, #667eea, #764ba2);
-                      color: white;
-                      min-height: 100vh;
-                      margin: 0;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      flex-direction: column;
-                  }
-                  .container {
-                      background: rgba(255,255,255,0.1);
-                      padding: 40px;
-                      border-radius: 20px;
-                      backdrop-filter: blur(10px);
-                  }
-                  .error { color: #ff6b6b; font-size: 1.2em; margin: 20px 0; }
-                  .info { color: #4ecdc4; margin: 15px 0; }
-                  .code { 
-                      background: rgba(0,0,0,0.3); 
-                      padding: 15px; 
-                      border-radius: 10px; 
-                      font-family: monospace;
-                      margin: 20px 0;
-                  }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <h1>🔍 GitHub Finder</h1>
-                  <p class="error">⚠️ index.html 파일을 찾을 수 없습니다</p>
-                  <p class="info">다음 위치 중 하나에 파일을 업로드해주세요:</p>
-                  <div class="code">
-                      📁 저장소 루트/index.html<br>
-                      📁 저장소 루트/html/index.html
-                  </div>
-                  <p class="info">파일 업로드 후 자동으로 다시 배포됩니다.</p>
-              </div>
-          </body>
-          </html>
-          HTMLEOF
-            echo "🆘 Emergency index.html created"
-          fi
-
-      - name: 📋 Final verification
+      - name: 📋 Verify build output
         run: |
-          echo "🗂️ Final public directory contents:"
+          echo "🗂️ Build output verification:"
+          echo "================================"
           ls -la public/
           echo ""
-          echo "📊 File size report:"
+          echo "📊 File sizes:"
           for file in public/*; do
             if [ -f "$file" ]; then
               size=$(wc -c < "$file")
@@ -198,10 +112,15 @@ jobs:
             fi
           done
           echo ""
-          echo "🔍 index.html preview (first 5 lines):"
-          head -5 public/index.html
+          echo "🔍 Path verification in index.html:"
+          grep -n "href=\|src=" public/index.html | head -5
+          echo ""
+          echo "🎯 Critical files check:"
+          echo "index.html: $([ -f 'public/index.html' ] && echo '✅' || echo '❌')"
+          echo "style.css: $([ -f 'public/style.css' ] && echo '✅' || echo '❌')"
+          echo "app.js: $([ -f 'public/app.js' ] && echo '✅' || echo '❌')"
 
-      - name: 📤 Upload artifact
+      - name: 📤 Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: "./public"
@@ -217,17 +136,17 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: ✅ Deployment summary
+      - name: ✅ Deployment success
         run: |
           echo ""
-          echo "🎉 Deployment completed!"
-          echo "🌐 Site URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "🎉 GitHub Finder deployed successfully!"
+          echo "🌐 Live at: ${{ steps.deployment.outputs.page_url }}"
           echo ""
-          echo "📋 Deployment checklist:"
-          echo "   ✅ Repository scanned"
-          echo "   ✅ Files detected and copied"
-          echo "   ✅ Static site built"
-          echo "   ✅ Uploaded to GitHub Pages"
-          echo "   ✅ Site is now live!"
+          echo "📁 Deployed structure:"
+          echo "   • index.html (main page)"
+          echo "   • style.css (from css/style.css)"
+          echo "   • app.js (from js/app.js)"
           echo ""
-          echo "🔗 Visit your GitHub Finder at the URL above!"
+          echo "🔧 Note: Paths automatically converted for deployment"
+          echo "   Local: css/style.css → Deployed: style.css"
+          echo "   Local: js/app.js → Deployed: app.js"
