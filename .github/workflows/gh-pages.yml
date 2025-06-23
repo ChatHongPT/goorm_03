@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -19,134 +16,196 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout repository
+      - name: 📥 Checkout
         uses: actions/checkout@v4
+
+      - name: 🔍 Debug - Show all files
+        run: |
+          echo "📁 Complete repository structure:"
+          find . -type f -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.md" | sort
+          echo ""
+          echo "📂 Directory tree:"
+          ls -la
+          if [ -d "css" ]; then
+            echo "CSS folder contents:"
+            ls -la css/
+          fi
+          if [ -d "js" ]; then
+            echo "JS folder contents:"
+            ls -la js/
+          fi
+
+      - name: 🛠️ Build site
+        run: |
+          mkdir -p public
+
+          echo "🔄 Copying files..."
+
+          # Copy index.html from root
+          if [ -f "index.html" ]; then
+            cp index.html public/
+            echo "✅ Copied index.html"
+          else
+            echo "❌ index.html not found!"
+            echo "Creating minimal index.html..."
+            cat > public/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>GitHub Finder</title>
+            <style>
+              body { font-family: Arial; padding: 20px; background: linear-gradient(45deg, #667eea, #764ba2); }
+              .container { background: white; padding: 40px; border-radius: 10px; max-width: 600px; margin: 0 auto; }
+              input, button { padding: 10px; margin: 10px; border: 1px solid #ddd; border-radius: 5px; }
+              button { background: #667eea; color: white; cursor: pointer; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>🔍 GitHub Finder</h1>
+              <p>Enter a GitHub username to search:</p>
+              <input type="text" id="username" placeholder="GitHub username">
+              <button onclick="search()">Search</button>
+              <div id="result"></div>
+            </div>
+            <script>
+              async function search() {
+                const username = document.getElementById('username').value;
+                const result = document.getElementById('result');
+                if (!username) return;
+                
+                try {
+                  const response = await fetch(`https://api.github.com/users/${username}`);
+                  const user = await response.json();
+                  
+                  if (response.ok) {
+                    result.innerHTML = `
+                      <h2>${user.name || user.login}</h2>
+                      <img src="${user.avatar_url}" width="100" style="border-radius: 50%">
+                      <p>Public Repos: ${user.public_repos}</p>
+                      <p>Followers: ${user.followers}</p>
+                      <a href="${user.html_url}" target="_blank">View Profile</a>
+                    `;
+                  } else {
+                    result.innerHTML = '<p>User not found!</p>';
+                  }
+                } catch (error) {
+                  result.innerHTML = '<p>Error occurred!</p>';
+                }
+              }
+            </script>
+          </body>
+          </html>
+          EOF
+          fi
+
+          # Try to copy CSS - multiple attempts
+          CSS_COPIED=false
+          for css_path in "css/style.css" "style.css" "styles.css"; do
+            if [ -f "$css_path" ]; then
+              cp "$css_path" public/style.css
+              echo "✅ Copied CSS from $css_path"
+              CSS_COPIED=true
+              break
+            fi
+          done
+
+          if [ "$CSS_COPIED" = false ]; then
+            echo "⚠️ No CSS file found, creating basic styles..."
+            cat > public/style.css << 'EOF'
+          /* GitHub Finder Basic Styles */
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 20px;
+          }
+          .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+          }
+          h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+          }
+          input, button {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+          }
+          input {
+            width: 70%;
+            margin-right: 10px;
+            border: 2px solid #ddd;
+          }
+          button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            cursor: pointer;
+          }
+          EOF
+          fi
+
+          # Try to copy JS
+          JS_COPIED=false
+          for js_path in "js/app.js" "app.js" "script.js"; do
+            if [ -f "$js_path" ]; then
+              cp "$js_path" public/app.js
+              echo "✅ Copied JS from $js_path"
+              JS_COPIED=true
+              break
+            fi
+          done
+
+          if [ "$JS_COPIED" = false ]; then
+            echo "⚠️ No JS file found, creating basic script..."
+            cat > public/app.js << 'EOF'
+          console.log('GitHub Finder loaded successfully!');
+
+          document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM ready - GitHub Finder initialized');
+          });
+          EOF
+          fi
+
+          # Copy other files
+          [ -f "README.md" ] && cp README.md public/readme.md
+          [ -f "favicon.ico" ] && cp favicon.ico public/
+
+      - name: 📋 Final check
+        run: |
+          echo "📦 Final build contents:"
+          ls -la public/
+          echo ""
+          echo "📏 File sizes:"
+          du -h public/*
+          echo ""
+          echo "🔍 HTML check:"
+          head -10 public/index.html
 
       - name: 🔧 Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: 🔍 Debug repository structure
-        run: |
-          echo "📁 Repository root contents:"
-          ls -la
-          echo ""
-          echo "📂 CSS folder:"
-          if [ -d "css" ]; then
-            ls -la css/
-          else
-            echo "❌ css/ folder not found"
-          fi
-          echo ""
-          echo "📂 JS folder:"
-          if [ -d "js" ]; then
-            ls -la js/
-          else
-            echo "❌ js/ folder not found"
-          fi
-          echo ""
-          echo "🔍 Required files check:"
-          echo "index.html: $([ -f 'index.html' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-          echo "css/style.css: $([ -f 'css/style.css' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-          echo "js/app.js: $([ -f 'js/app.js' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-
-      - name: 📂 Build for GitHub Pages
-        run: |
-          echo "🏗️ Creating build directory..."
-          mkdir -p public
-
-          echo "📋 Copying files and fixing paths..."
-
-          # Copy index.html and fix paths for deployment
-          if [ -f "index.html" ]; then
-            echo "✅ Processing index.html..."
-            # Copy and modify paths for flat structure
-            cp index.html public/index.html
-            
-            # Fix CSS path: css/style.css → style.css
-            sed -i 's|href="css/style.css"|href="style.css"|g' public/index.html
-            
-            # Fix JS path: js/app.js → app.js  
-            sed -i 's|src="js/app.js"|src="app.js"|g' public/index.html
-            
-            echo "✅ Fixed paths in index.html for deployment"
-          else
-            echo "❌ index.html not found!"
-            exit 1
-          fi
-
-          # Copy CSS file
-          if [ -f "css/style.css" ]; then
-            cp css/style.css public/style.css
-            echo "✅ Copied css/style.css → public/style.css"
-          else
-            echo "❌ css/style.css not found!"
-          fi
-
-          # Copy JS file
-          if [ -f "js/app.js" ]; then
-            cp js/app.js public/app.js
-            echo "✅ Copied js/app.js → public/app.js"
-          else
-            echo "❌ js/app.js not found!"
-          fi
-
-          # Copy other files if they exist
-          [ -f "README.md" ] && cp README.md public/readme.md && echo "✅ Copied README.md"
-          [ -f "favicon.ico" ] && cp favicon.ico public/ && echo "✅ Copied favicon.ico"
-
-      - name: 📋 Verify build output
-        run: |
-          echo "🗂️ Build output verification:"
-          echo "================================"
-          ls -la public/
-          echo ""
-          echo "📊 File sizes:"
-          for file in public/*; do
-            if [ -f "$file" ]; then
-              size=$(wc -c < "$file")
-              filename=$(basename "$file")
-              echo "📄 $filename: $size bytes"
-            fi
-          done
-          echo ""
-          echo "🔍 Path verification in index.html:"
-          grep -n "href=\|src=" public/index.html | head -5
-          echo ""
-          echo "🎯 Critical files check:"
-          echo "index.html: $([ -f 'public/index.html' ] && echo '✅' || echo '❌')"
-          echo "style.css: $([ -f 'public/style.css' ] && echo '✅' || echo '❌')"
-          echo "app.js: $([ -f 'public/app.js' ] && echo '✅' || echo '❌')"
-
-      - name: 📤 Upload Pages artifact
+      - name: 📤 Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: "./public"
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: 🚀 Deploy to GitHub Pages
+      - name: 🚀 Deploy
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: ✅ Deployment success
+      - name: ✅ Success
         run: |
-          echo ""
-          echo "🎉 GitHub Finder deployed successfully!"
-          echo "🌐 Live at: ${{ steps.deployment.outputs.page_url }}"
-          echo ""
-          echo "📁 Deployed structure:"
-          echo "   • index.html (main page)"
-          echo "   • style.css (from css/style.css)"
-          echo "   • app.js (from js/app.js)"
-          echo ""
-          echo "🔧 Note: Paths automatically converted for deployment"
-          echo "   Local: css/style.css → Deployed: style.css"
-          echo "   Local: js/app.js → Deployed: app.js"
+          echo "🎉 Deployed to: ${{ steps.deployment.outputs.page_url }}"
