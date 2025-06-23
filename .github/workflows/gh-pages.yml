@@ -30,69 +30,32 @@ jobs:
 
       - name: 🧠 Extract repository name
         id: extract_repo
-        run: |
-          echo "REPO_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
-          echo "📦 Repository name is '${GITHUB_REPOSITORY##*/}'"
+        run: echo "REPO_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
 
-      - name: 🔍 Debug repository structure
+      - name: 📂 Build for GitHub Pages (flatten structure)
         run: |
-          echo "📁 Repository root contents:"
-          ls -la
-          echo ""
-          echo "📂 CSS folder:"
-          if [ -d "css" ]; then
-            ls -la css/
-          else
-            echo "❌ css/ folder not found"
-          fi
-          echo ""
-          echo "📂 JS folder:"
-          if [ -d "js" ]; then
-            ls -la js/
-          else
-            echo "❌ js/ folder not found"
-          fi
-          echo ""
-          echo "🔍 Required files check:"
-          echo "index.html: $([ -f 'index.html' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-          echo "css/style.css: $([ -f 'css/style.css' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-          echo "js/app.js: $([ -f 'js/app.js' ] && echo '✅ EXISTS' || echo '❌ MISSING')"
-
-      - name: 📂 Build for GitHub Pages
-        run: |
-          echo "🏗️ Creating build directory..."
           mkdir -p public
 
-          echo "📋 Copying files and fixing paths..."
+          echo "📄 Copy index.html and rewrite paths"
           cp index.html public/index.html
 
-          # Insert <base href="/REPO_NAME/"> into <head> for GitHub Pages
-          echo "🔧 Inserting <base> tag into <head>..."
-          sed -i 's|<head>|<head><base href="/'"$REPO_NAME"'/">|' public/index.html
+          # flatten 경로로 변경 (css/style.css → style.css)
+          sed -i 's|href=".*css/style.css"|href="style.css"|g' public/index.html
+          sed -i 's|src=".*js/app.js"|src="app.js"|g' public/index.html
 
-          # Copy assets
-          [ -f "css/style.css" ] && cp css/style.css public/style.css && echo "✅ Copied style.css"
-          [ -f "js/app.js" ] && cp js/app.js public/app.js && echo "✅ Copied app.js"
+          echo "📦 Copy resources to flat public/"
+          cp css/style.css public/style.css
+          cp js/app.js public/app.js
+          [ -f "favicon.ico" ] && cp favicon.ico public/
           [ -f "README.md" ] && cp README.md public/readme.md
-          [ -f "favicon.ico" ] && cp favicon.ico public/favicon.ico
 
       - name: 📋 Verify build output
         run: |
-          echo "🗂️ Build output verification:"
+          echo "📁 public/ directory content:"
           ls -la public/
           echo ""
-          echo "📊 File sizes:"
-          for file in public/*; do
-            if [ -f "$file" ]; then
-              size=$(wc -c < "$file")
-              filename=$(basename "$file")
-              echo "📄 $filename: $size bytes"
-            fi
-          done
-          echo ""
-          echo "🔍 Path check in index.html:"
-          grep -n "href=\|src=" public/index.html | head -5
-          echo ""
+          echo "🔍 Checking key file references in index.html:"
+          grep -E 'href=|src=' public/index.html
 
       - name: 📤 Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -113,8 +76,5 @@ jobs:
       - name: ✅ Deployment success
         run: |
           echo ""
-          echo "🎉 GitHub Finder deployed successfully!"
-          echo "🌐 Live at: ${{ steps.deployment.outputs.page_url }}"
-          echo ""
-          echo "📁 Deployed files:"
-          ls -la
+          echo "🎉 GitHub Finder successfully deployed!"
+          echo "🔗 Visit: ${{ steps.deployment.outputs.page_url }}"
