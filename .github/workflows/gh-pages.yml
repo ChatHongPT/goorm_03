@@ -3,27 +3,22 @@ name: Deploy GitHub Finder to GitHub Pages
 on:
   push:
     branches:
-      - main # 또는 master (저장소의 기본 브랜치에 맞게 수정)
+      - main
   pull_request:
     branches:
       - main
-
-  # 수동으로 워크플로우 실행 허용
   workflow_dispatch:
 
-# GitHub Pages에 배포하기 위한 권한 설정
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 동시 배포 방지
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # 빌드 작업
   build:
     runs-on: ubuntu-latest
     steps:
@@ -33,60 +28,98 @@ jobs:
       - name: 🔧 Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: 📂 Prepare build directory
+      - name: 🔍 Debug repository structure
         run: |
-          # public 디렉토리 생성
+          echo "📁 Repository root:"
+          ls -la
+          echo ""
+          echo "📂 Checking required folders:"
+          if [ -d "html" ]; then
+            echo "✅ html/ folder found"
+            ls -la html/
+          else
+            echo "❌ html/ folder not found"
+          fi
+
+          if [ -d "css" ]; then
+            echo "✅ css/ folder found"
+            ls -la css/
+          else
+            echo "❌ css/ folder not found"
+          fi
+
+          if [ -d "js" ]; then
+            echo "✅ js/ folder found"
+            ls -la js/
+          else
+            echo "❌ js/ folder not found"
+          fi
+
+      - name: 📂 Build static site
+        run: |
+          echo "🏗️ Creating public directory..."
           mkdir -p public
 
-          # 현재 구조에 맞게 파일들 복사
-          cp index.html public/
-          cp style.css public/
-          cp app.js public/
-          cp README.md public/
+          echo "📋 Copying files with exact paths..."
 
-          # 추가 파일들이 있다면 복사 (선택사항)
-          if [ -f favicon.ico ]; then cp favicon.ico public/; fi
-          if [ -d images ]; then cp -r images public/; fi
-          if [ -d assets ]; then cp -r assets public/; fi
-
-      - name: 📋 Verify copied files
-        run: |
-          echo "🗂️ Build directory contents:"
-          ls -la public/
-          echo ""
-          echo "📄 Critical files check:"
-          if [ -f "public/index.html" ]; then
-            echo "✅ index.html exists"
-            echo "📏 Size: $(wc -c < public/index.html) bytes"
-            echo "🔍 First few lines:"
-            head -5 public/index.html
+          # Copy HTML file
+          if [ -f "html/index.html" ]; then
+            cp html/index.html public/index.html
+            echo "✅ Copied: html/index.html → public/index.html"
           else
-            echo "❌ index.html MISSING - This will cause README to show instead!"
+            echo "❌ MISSING: html/index.html"
             exit 1
           fi
 
-          if [ -f "public/style.css" ]; then
-            echo "✅ style.css exists ($(wc -c < public/style.css) bytes)"
+          # Copy CSS file
+          if [ -f "css/style.css" ]; then
+            cp css/style.css public/style.css
+            echo "✅ Copied: css/style.css → public/style.css"
           else
-            echo "⚠️ style.css missing - site will have no styling"
+            echo "⚠️ WARNING: css/style.css not found"
           fi
 
-          if [ -f "public/app.js" ]; then
-            echo "✅ app.js exists ($(wc -c < public/app.js) bytes)"
+          # Copy JS file
+          if [ -f "js/app.js" ]; then
+            cp js/app.js public/app.js
+            echo "✅ Copied: js/app.js → public/app.js"
           else
-            echo "⚠️ app.js missing - site will have no functionality"
+            echo "⚠️ WARNING: js/app.js not found"
           fi
+
+          # Copy README (optional)
+          if [ -f "README.md" ]; then
+            cp README.md public/readme.md
+            echo "✅ Copied: README.md → public/readme.md"
+          fi
+
+      - name: 📋 Verify build output
+        run: |
+          echo "🗂️ Final public directory contents:"
+          ls -la public/
+          echo ""
+          echo "📄 File verification:"
+          for file in index.html style.css app.js; do
+            if [ -f "public/$file" ]; then
+              size=$(wc -c < "public/$file")
+              echo "✅ $file ($size bytes)"
+            else
+              echo "❌ $file MISSING"
+              if [ "$file" = "index.html" ]; then
+                exit 1
+              fi
+            fi
+          done
 
           echo ""
-          echo "🌐 Files that will be served:"
-          find public/ -type f -exec echo "  📄 {}" \;
+          echo "🔍 index.html preview:"
+          head -10 public/index.html
 
       - name: 📤 Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: "./public"
 
-  # 배포 작업
   deploy:
     environment:
       name: github-pages
@@ -98,7 +131,14 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: ✅ Deployment complete
+      - name: ✅ Success notification
         run: |
-          echo "🎉 GitHub Finder has been successfully deployed!"
-          echo "📍 Site URL: ${{ steps.deployment.outputs.page_url }}"
+          echo ""
+          echo "🎉 Deployment successful!"
+          echo "🌐 Your GitHub Finder is now live at:"
+          echo "   ${{ steps.deployment.outputs.page_url }}"
+          echo ""
+          echo "📁 Deployed files:"
+          echo "   • index.html (GitHub Finder main page)"
+          echo "   • style.css (styling)"
+          echo "   • app.js (JavaScript functionality)"
