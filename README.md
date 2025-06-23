@@ -1,13 +1,13 @@
 # 🔍 GitHub Finder
 
-![GitHub Finder](https://img.shields.io/badge/GitHub-Finder-667eea?style=for-the-badge&logo=github&logoColor=white)
-![Version](https://img.shields.io/badge/version-2.0.0-764ba2?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-f093fb?style=for-the-badge)
+![GitHub Finder](https://img.shields.io/badge/GitHub-Finder-667eea?style=flat-square&logo=github&logoColor=white)
+![Version](https://img.shields.io/badge/version-2.0.0-764ba2?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-f093fb?style=flat-square)
 
-![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
-![GitHub API](https://img.shields.io/badge/GitHub%20API-181717?style=for-the-badge&logo=github&logoColor=white)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=flat-square&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=flat-square&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=flat-square&logo=javascript&logoColor=%23F7DF1E)
+![GitHub API](https://img.shields.io/badge/GitHub%20API-181717?style=flat-square&logo=github&logoColor=white)
 
 > 🚀 **아름답고 현대적인 GitHub 사용자 검색 웹 애플리케이션**
 
@@ -186,5 +186,44 @@ class GitHubAPI {
 - 상세한 커밋 메시지 작성
 - 새로운 기능에 대한 문서 추가
 - 크로스 브라우저 호환성 확인
+
+---
+
+## 🛠 GitHub Actions
+
+![Deploy to GitHub Pages](https://github.com/your-username/github-finder/actions/workflows/main.yml/badge.svg?branch=main)
+
+```yaml
+# .github/workflows/main.yml
+
+name: 📦 Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build Project
+        run: echo "No build needed for static site."
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+```
 
 ---
