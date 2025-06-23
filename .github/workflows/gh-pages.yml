@@ -39,9 +39,9 @@ jobs:
           mkdir -p public
 
           # 현재 구조에 맞게 파일들 복사
-          cp index.html public/
-          cp style.css public/
-          cp app.js public/
+          cp ../html/index.html public/
+          cp ../css/style.css public/
+          cp ../js/app.js public/
           cp README.md public/
 
           # 추가 파일들이 있다면 복사 (선택사항)
