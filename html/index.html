@@ -8,68 +8,38 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-  <div class="background-animation">
-    <div class="floating-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
-      <div class="shape shape-3"></div>
-      <div class="shape shape-4"></div>
-    </div>
-  </div>
-
   <nav class="navbar">
-    <div class="navbar-content">
-      <i class="fab fa-github"></i>
-      <span>GitHub Finder</span>
-    </div>
+    <i class="fab fa-github"></i>
+    GitHub Finder
   </nav>
-
+  
   <div class="container">
-    <div class="header-section">
-      <h1>
-        <span class="gradient-text">GitHub User Explorer</span>
-      </h1>
-      <p class="desc">
-        <i class="fas fa-search"></i>
-        GitHub 사용자 이름을 입력하여 프로필과 저장소를 확인해보세요
-      </p>
-    </div>
-
+    <h1>Search GitHub Users</h1>
+    <p class="desc">
+      <i class="fas fa-search"></i>
+      Enter a username to fetch a user profile and repos
+    </p>
+    
     <div class="search-section">
-      <div class="search-container">
-        <div class="input-wrapper">
-          <i class="fas fa-user search-icon"></i>
-          <input type="text" id="usernameInput" placeholder="GitHub 사용자 이름을 입력하세요...">
-        </div>
-        <button id="searchBtn" class="search-btn">
-          <i class="fas fa-search"></i>
-          <span>검색</span>
-        </button>
-      </div>
+      <input type="text" id="usernameInput" placeholder="Enter GitHub username">
+      <button id="searchBtn">
+        <i class="fas fa-search"></i>
+        검색
+      </button>
     </div>
-
-    <div id="spinner" class="spinner-container hidden">
-      <div class="spinner">
-        <div class="spinner-inner"></div>
-      </div>
-      <p class="loading-text">사용자 정보를 불러오는 중...</p>
-    </div>
-
-    <div id="profile" class="profile-section"></div>
-    <div id="repos" class="repos-section"></div>
-    <div id="grass" class="grass-section"></div>
+    
+    <div id="spinner" class="spinner hidden"></div>
+    
+    <div id="profile"></div>
+    <div id="repos"></div>
+    <div id="grass"></div>
   </div>
-
+  
   <footer class="footer">
-    <div class="footer-content">
-      <p>
-        <i class="fas fa-heart"></i>
-        Made with love using GitHub API
-      </p>
-      <p class="copyright">© 2025 GitHub Finder. All rights reserved.</p>
-    </div>
+    <i class="fas fa-heart" style="color: #f87171;"></i>
+    GitHub Finder © 2025
   </footer>
-
+  
   <script src="../js/app.js"></script>
 </body>
 </html>
