@@ -39,9 +39,9 @@ jobs:
           mkdir -p public
 
           # 현재 구조에 맞게 파일들 복사
-          cp ../html/index.html public/
-          cp ../css/style.css public/
-          cp ../js/app.js public/
+          cp index.html public/
+          cp style.css public/
+          cp app.js public/
           cp README.md public/
 
           # 추가 파일들이 있다면 복사 (선택사항)
@@ -49,10 +49,37 @@ jobs:
           if [ -d images ]; then cp -r images public/; fi
           if [ -d assets ]; then cp -r assets public/; fi
 
-      - name: 📋 List build files
+      - name: 📋 Verify copied files
         run: |
           echo "🗂️ Build directory contents:"
           ls -la public/
+          echo ""
+          echo "📄 Critical files check:"
+          if [ -f "public/index.html" ]; then
+            echo "✅ index.html exists"
+            echo "📏 Size: $(wc -c < public/index.html) bytes"
+            echo "🔍 First few lines:"
+            head -5 public/index.html
+          else
+            echo "❌ index.html MISSING - This will cause README to show instead!"
+            exit 1
+          fi
+
+          if [ -f "public/style.css" ]; then
+            echo "✅ style.css exists ($(wc -c < public/style.css) bytes)"
+          else
+            echo "⚠️ style.css missing - site will have no styling"
+          fi
+
+          if [ -f "public/app.js" ]; then
+            echo "✅ app.js exists ($(wc -c < public/app.js) bytes)"
+          else
+            echo "⚠️ app.js missing - site will have no functionality"
+          fi
+
+          echo ""
+          echo "🌐 Files that will be served:"
+          find public/ -type f -exec echo "  📄 {}" \;
 
       - name: 📤 Upload artifact
         uses: actions/upload-pages-artifact@v3
