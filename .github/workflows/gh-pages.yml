@@ -25,37 +25,46 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Pages
+      - name: 🔧 Setup GitHub Pages
         uses: actions/configure-pages@v4
 
-      - name: 🧠 Extract repository name
-        id: extract_repo
-        run: echo "REPO_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
-
-      - name: 📂 Build for GitHub Pages (flatten structure)
+      - name: 📂 Build for GitHub Pages (flat copy from root)
         run: |
+          echo "🏗️ Creating public directory..."
           mkdir -p public
 
-          echo "📄 Copy index.html and rewrite paths"
+          echo "📄 Copy index.html"
+          if [ ! -f "index.html" ]; then
+            echo "❌ index.html not found!"
+            exit 1
+          fi
           cp index.html public/index.html
 
-          # flatten 경로로 변경 (css/style.css → style.css)
-          sed -i 's|href=".*css/style.css"|href="style.css"|g' public/index.html
-          sed -i 's|src=".*js/app.js"|src="app.js"|g' public/index.html
+          echo "🔧 Rewriting asset paths in index.html"
+          sed -i 's|href=".*style.css"|href="style.css"|g' public/index.html
+          sed -i 's|src=".*app.js"|src="app.js"|g' public/index.html
 
-          echo "📦 Copy resources to flat public/"
-          cp css/style.css public/style.css
-          cp js/app.js public/app.js
-          [ -f "favicon.ico" ] && cp favicon.ico public/
-          [ -f "README.md" ] && cp README.md public/readme.md
+          echo "📦 Copy assets from root"
+          if [ -f "style.css" ]; then
+            cp style.css public/style.css
+            echo "✅ Copied style.css"
+          else
+            echo "❌ style.css not found!"
+            exit 1
+          fi
 
-      - name: 📋 Verify build output
-        run: |
-          echo "📁 public/ directory content:"
+          if [ -f "app.js" ]; then
+            cp app.js public/app.js
+            echo "✅ Copied app.js"
+          else
+            echo "❌ app.js not found!"
+            exit 1
+          fi
+
+          [ -f favicon.ico ] && cp favicon.ico public/
+
+          echo "📁 public directory content:"
           ls -la public/
-          echo ""
-          echo "🔍 Checking key file references in index.html:"
-          grep -E 'href=|src=' public/index.html
 
       - name: 📤 Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -76,5 +85,5 @@ jobs:
       - name: ✅ Deployment success
         run: |
           echo ""
-          echo "🎉 GitHub Finder successfully deployed!"
-          echo "🔗 Visit: ${{ steps.deployment.outputs.page_url }}"
+          echo "🎉 Deployment successful!"
+          echo "🔗 Visit your site at: ${{ steps.deployment.outputs.page_url }}"
