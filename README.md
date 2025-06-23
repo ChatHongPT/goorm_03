@@ -223,5 +223,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
 ```
+---
+
+### 배포된 앱 접근
+
+이 애플리케이션은 GitHub Pages를 통해 자동으로 배포됩니다. 배포된 앱은 다음 URL에서 접근할 수 있습니다:
+
+`https://ChatHongPT.github.io/goorm_03/`
 
 ---
