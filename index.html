@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GitHub Finder</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- 📌 GitHub Pages base path -->
+  <base href="/goorm_03/">
+
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ✅ Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- ✅ FontAwesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
   <nav class="navbar">
     <i class="fab fa-github"></i>
     GitHub Finder
   </nav>
-  
+
   <div class="container">
     <h1>Search GitHub Users</h1>
     <p class="desc">
       <i class="fas fa-search"></i>
       Enter a username to fetch a user profile and repos
     </p>
-    
+
     <div class="search-section">
-      <input type="text" id="usernameInput" placeholder="Enter GitHub username">
+      <input type="text" id="usernameInput" placeholder="Enter GitHub username" />
       <button id="searchBtn">
         <i class="fas fa-search"></i>
         검색
       </button>
     </div>
-    
+
     <div id="spinner" class="spinner hidden"></div>
-    
+
     <div id="profile"></div>
     <div id="repos"></div>
     <div id="grass"></div>
   </div>
-  
+
   <footer class="footer">
     <i class="fas fa-heart" style="color: #f87171;"></i>
     GitHub Finder © 2025
   </footer>
-  
+
   <script src="app.js"></script>
 </body>
 </html>
