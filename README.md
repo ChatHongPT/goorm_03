@@ -56,13 +56,13 @@ GitHub API를 활용하여 사용자 프로필, 저장소 정보, 그리고 기�
 
    ```bash
    git clone https://github.com/ChatHongPT/goorm_03.git
-   cd github-finder
+   cd goorm_03
    ```
 
 2. **파일 구조 확인**
 
    ```
-   github-finder/
+   goorm_03/
    ├── index.html      # 메인 HTML 파일
    ├── style.css       # 스타일시트
    ├── app.js          # JavaScript 로직
